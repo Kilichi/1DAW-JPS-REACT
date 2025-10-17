@@ -1,45 +1,32 @@
 import { useState } from 'react';
-import CodeViewer from '../code/main';
-
-const tuCodigo = `
-function Perro(nombre, edad) {
-    let perro = Object.create(ObjetoConstructor);
-    perro.nombre = nombre;
-    perro.edad = edad;
-    return perro;
-}
-
-let ObjetoConstructor = {
-    habla: function(){
-        return "¡Soy un perro!"
-    }
-}
-
-let firulais = Perro("Firulais", 9);
-console.log(firulais);
-`
+import javaCalculadora from '../../assets/ejercicios/javaCalculadora.png';
+import LinkButton from '../linkButton/main';
 
 const DATA = {
     "Programación": {
         URL: '#',
         CategoryIcon: 'fas fa-cogs',
-        CategoryTittle: 'Programación',
-        CategoryDescription: 'Java, JavaScript y Python',
-        CategoryCount: '3 lenguajes'
+        CategoryTittle: 'Calculadora JAVA',
+        CategoryDescription: 'Calculadora en consola con JAVA',
+        CategoryCount: 'JAVA',
+        Image: javaCalculadora,
+        Code: 'https://github.com/kilichi'
     },
     "Bases de Datos": {
         URL: '#',
         CategoryIcon: 'fas fa-database',
         CategoryTittle: 'Bases de Datos',
         CategoryDescription: 'Proyectos con gestión de datos',
-        CategoryCount: 'En desarrollo'
+        CategoryCount: 'En desarrollo',
+        Image: 'https://example.com/programacion.png',
     },
     "Entornos de Desarrollo": {
         URL: '#',
         CategoryIcon: 'fas fa-tools',
         CategoryTittle: 'Entornos de Desarrollo',
         CategoryDescription: 'Herramientas y diagramas de flujo',
-        CategoryCount: '2 recursos'
+        CategoryCount: '2 recursos',
+        Image: 'https://example.com/programacion.png',
     }
 }
 
@@ -59,6 +46,8 @@ const Projects = () => {
 
     return (
         <>
+
+            <h2 className='section-title'>PROYECTOS PRINCIPALES</h2>
             <section className="categories-grid">
                 {Object.keys(DATA).map((projectKey) => (
                     <div 
@@ -86,15 +75,19 @@ const Projects = () => {
                 <div className="modal-overlay" onClick={closeModal}>
                     <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                         <button className="modal-close" onClick={closeModal}>×</button>
-                        
                         <div className="modal-header">
                             <i className={selectedProject.CategoryIcon}></i>
                             <h2>{selectedProject.CategoryTittle}</h2>
                         </div>
-                        
+
+                        <img src={selectedProject.Image} alt={selectedProject.CategoryDescription} />
+                    
                         <div className="modal-body">
                             <p>{selectedProject.CategoryDescription}</p>
-                            <span className="modal-count">{selectedProject.CategoryCount}</span>
+                            <div className="info-buttons">
+                                <span className="modal-count">{selectedProject.CategoryCount}</span>
+                                <LinkButton link={selectedProject.Code} />
+                            </div>
                         </div>
                     </div>
                 </div>

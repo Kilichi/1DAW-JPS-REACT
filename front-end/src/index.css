@@ -367,6 +367,7 @@ html {
     gap: 1rem;
     margin-bottom: 1.5rem;
     padding-bottom: 1.5rem;
+    margin-top: 1.5rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -390,6 +391,7 @@ html {
     font-size: 1rem;
     line-height: 1.6;
     margin-bottom: 1rem;
+    margin-top: 1rem;
     color: var(--muted);
 }
 
@@ -402,6 +404,7 @@ html {
     font-size: 0.9rem;
     font-weight: 600;
     margin-top: 1rem;
+    margin-bottom: 1rem;
 }
 
 /* Scrollbar para el modal */
@@ -482,6 +485,19 @@ html {
     border-radius: 50px;
     font-size: 0.9rem;
     font-weight: 600;
-    margin-top: 0.5rem; /* Reducido */
+    margin-top: 1rem; /* Reducido */
     margin-bottom: 1rem; /* Añadido para separar del CodeViewer */
+}
+
+.link-button{
+    margin-left: 1rem;
+    background-color: rgba(124, 58, 237, 0.2);
+    border-radius: 50%;
+}
+
+.info-buttons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
 }
