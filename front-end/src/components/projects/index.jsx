@@ -1,41 +1,75 @@
-import { useState } from 'react';
-import javaCalculadora from '../../assets/ejercicios/javaCalculadora.png';
+import { useEffect, useState } from 'react';
 import LinkButton from '../linkButton/main';
 
-const DATA = {
-    "Programación": {
-        URL: '#',
-        CategoryIcon: 'fas fa-cogs',
-        CategoryTittle: 'Calculadora JAVA',
-        CategoryDescription: 'Calculadora en consola con JAVA',
-        CategoryCount: 'JAVA',
-        Image: javaCalculadora,
-        Code: 'https://github.com/kilichi'
-    },
-    "Bases de Datos": {
-        URL: '#',
-        CategoryIcon: 'fas fa-database',
-        CategoryTittle: 'Bases de Datos',
-        CategoryDescription: 'Proyectos con gestión de datos',
-        CategoryCount: 'En desarrollo',
-        Image: 'https://example.com/programacion.png',
-    },
-    "Entornos de Desarrollo": {
-        URL: '#',
-        CategoryIcon: 'fas fa-tools',
-        CategoryTittle: 'Entornos de Desarrollo',
-        CategoryDescription: 'Herramientas y diagramas de flujo',
-        CategoryCount: '2 recursos',
-        Image: 'https://example.com/programacion.png',
+// Configuración de la API
+const API_CONFIG = {
+    BASE_URL: 'http://localhost:3000',
+    ENDPOINTS: {
+        ARTICLES: '/api/articulos'
     }
-}
+};
+
+// Función para construir URL completa de imagen
+const getImageUrl = (imagePath) => {
+    if (!imagePath) return null;
+    
+    // Si ya es una URL completa, devolverla tal cual
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+        return imagePath;
+    }
+    
+    // Si es una ruta relativa, agregar la base URL
+    const cleanPath = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
+    return `${API_CONFIG.BASE_URL}${cleanPath}`;
+};
 
 const Projects = () => {
+    const [projects, setProjects] = useState([]);
     const [selectedProject, setSelectedProject] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    const handleCardClick = async (projectKey) => {
-        setSelectedProject(DATA[projectKey]);
+    useEffect(() => {
+        const fetchProjects = async () => {
+            try {
+                setLoading(true);
+                const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.ARTICLES}`);
+                
+                if (!response.ok) {
+                    throw new Error('Error al cargar los proyectos');
+                }
+                
+                const data = await response.json();
+                
+                // Convertir objeto a array si es necesario
+                let projectsArray = [];
+                if (Array.isArray(data)) {
+                    projectsArray = data;
+                } else if (typeof data === 'object' && data !== null) {
+                    // Si es un objeto, convertirlo a array de valores
+                    projectsArray = Object.keys(data).map(key => ({
+                        id: key,
+                        name: key,
+                        ...data[key]
+                    }));
+                }
+                
+                setProjects(projectsArray);
+                setError(null);
+            } catch (error) {
+                console.error("Error al obtener artículos:", error);
+                setError(error.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProjects();
+    }, []);
+
+    const handleCardClick = (project) => {
+        setSelectedProject(project);
         setIsModalOpen(true);
     };
 
@@ -44,28 +78,51 @@ const Projects = () => {
         setSelectedProject(null);
     };
 
+    if (loading) {
+        return (
+            <div className="loading-container">
+                <p>Cargando proyectos...</p>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="error-container">
+                <p>Error: {error}</p>
+            </div>
+        );
+    }
+
+    if (projects.length === 0) {
+        return (
+            <div className="empty-container">
+                <p>No hay proyectos disponibles</p>
+            </div>
+        );
+    }
+
     return (
         <>
-
             <h2 className='section-title'>PROYECTOS PRINCIPALES</h2>
             <section className="categories-grid">
-                {Object.keys(DATA).map((projectKey) => (
+                {projects.map((project, index) => (
                     <div 
-                        key={projectKey}
+                        key={project.id || index}
                         className="category-card" 
-                        onClick={() => handleCardClick(projectKey)}
+                        onClick={() => handleCardClick(project)}
                     >
                         <div className="category-icon">
-                            <i className={DATA[projectKey].CategoryIcon}></i>
+                            <i className={project.CategoryIcon || 'fas fa-folder'}></i>
                         </div>
                         <div className="category-title">
-                            {DATA[projectKey].CategoryTittle}
+                            {project.CategoryTittle || project.title || project.name}
                         </div>
                         <p className="category-description">
-                            {DATA[projectKey].CategoryDescription}
+                            {project.CategoryDescription || project.description || 'Sin descripción'}
                         </p>
                         <span className="project-count">
-                            {DATA[projectKey].CategoryCount}
+                            {project.CategoryCount || project.count || ''}
                         </span>
                     </div>
                 ))}
@@ -76,17 +133,40 @@ const Projects = () => {
                     <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                         <button className="modal-close" onClick={closeModal}>×</button>
                         <div className="modal-header">
-                            <i className={selectedProject.CategoryIcon}></i>
-                            <h2>{selectedProject.CategoryTittle}</h2>
+                            <i className={selectedProject.CategoryIcon || 'fas fa-folder'}></i>
+                            <h2>{selectedProject.CategoryTittle || selectedProject.title || selectedProject.name}</h2>
                         </div>
 
-                        <img src={selectedProject.Image} alt={selectedProject.CategoryDescription} />
+                        {selectedProject.Image && (
+                            <img 
+                                src={getImageUrl(selectedProject.Image)} 
+                                alt={selectedProject.CategoryDescription || selectedProject.description || 'Proyecto'}
+                                onError={(e) => {
+                                    e.target.style.display = 'none';
+                                    console.error('Error al cargar imagen:', selectedProject.Image);
+                                }}
+                            />
+                        )}
                     
                         <div className="modal-body">
-                            <p>{selectedProject.CategoryDescription}</p>
+                            <p>{selectedProject.CategoryDescription || selectedProject.description || 'Sin descripción'}</p>
                             <div className="info-buttons">
-                                <span className="modal-count">{selectedProject.CategoryCount}</span>
-                                <LinkButton link={selectedProject.Code} />
+                                <span className="modal-count">
+                                    {selectedProject.CategoryCount || selectedProject.count || ''}
+                                </span>
+                                {selectedProject.Code && (
+                                    <LinkButton link={selectedProject.Code} />
+                                )}
+                                {selectedProject.URL && selectedProject.URL !== '#' && (
+                                    <a 
+                                        href={selectedProject.URL} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        className="project-link"
+                                    >
+                                        Ver más
+                                    </a>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -96,5 +176,4 @@ const Projects = () => {
     );
 };
 
-
-export default Projects
+export default Projects;
