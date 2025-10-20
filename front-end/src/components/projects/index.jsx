@@ -3,7 +3,7 @@ import LinkButton from '../linkButton/main';
 
 // Configuración de la API
 const API_CONFIG = {
-    BASE_URL: 'http://localhost:3000',
+    BASE_URL: 'https://onedaw-jps-react.onrender.com',
     ENDPOINTS: {
         ARTICLES: '/api/articulos'
     }
