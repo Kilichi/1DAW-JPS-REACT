@@ -1,10 +1,50 @@
 import Header from './components/header/main'
 import Projects from './components/projects'
-
+import { useEffect } from 'react';
 
 import './App.css'
 
 function App() {
+
+    useEffect(() => {
+        const cursorGlow = document.createElement('div');
+        cursorGlow.id = 'cursor-glow';
+        document.body.appendChild(cursorGlow);
+        
+        let mouseX = 0, mouseY = 0;
+        let currentX = 0, currentY = 0;
+        
+        const handleMouseMove = (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            cursorGlow.style.opacity = '1';
+        };
+        
+        const handleMouseLeave = () => {
+            cursorGlow.style.opacity = '0';
+        };
+        
+        const animate = () => {
+            // Movimiento más rápido y suave
+            currentX += (mouseX - currentX) * 0.25;
+            currentY += (mouseY - currentY) * 0.25;
+            
+            cursorGlow.style.left = currentX + 'px';
+            cursorGlow.style.top = currentY + 'px';
+            
+            requestAnimationFrame(animate);
+        };
+        
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseleave', handleMouseLeave);
+        animate();
+        
+        return () => {
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseleave', handleMouseLeave);
+            cursorGlow.remove();
+        };
+    }, []);
   return (
       <div class="container">
         <Header />
